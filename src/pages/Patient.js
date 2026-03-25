@@ -5,31 +5,49 @@ import "./Patient.css";
 function Patient() {
   const navigate = useNavigate();
 
-  // State
+  // Appointment state
   const [appointments, setAppointments] = useState([]);
+
+  // Medical records (dummy count based on appointments)
   const [records, setRecords] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [labReports, setLabReports] = useState([
-    "Blood Test - Normal",
-    "X-Ray - Clear"
-  ]);
 
-  const [form, setForm] = useState({
-    doctor: "",
-    date: ""
-  });
+  // Lab reports
+  const [labReports, setLabReports] = useState([]);
 
-  // Handle booking
-  const handleBooking = () => {
-    if (!form.doctor || !form.date) {
-      alert("Fill all fields");
+  // Form input
+  const [name, setName] = useState("");
+  const [problem, setProblem] = useState("");
+
+  // Book appointment
+  const handleBook = () => {
+    if (!name || !problem) {
+      alert("Please fill all fields");
       return;
     }
 
-    setAppointments([...appointments, form]);
-    setRecords([...records, "Consultation Record"]);
-    setForm({ doctor: "", date: "" });
-    setShowForm(false);
+    const newAppointment = {
+      name,
+      problem,
+      time: new Date().toLocaleString()
+    };
+
+    setAppointments([...appointments, newAppointment]);
+
+    // Add to records
+    setRecords([...records, newAppointment]);
+
+    // Add dummy lab report
+    setLabReports([
+      ...labReports,
+      {
+        name,
+        report: "Blood Test - Normal",
+        date: new Date().toLocaleDateString()
+      }
+    ]);
+
+    setName("");
+    setProblem("");
   };
 
   return (
@@ -46,70 +64,86 @@ function Patient() {
         </div>
       </div>
 
-      <h1>Welcome, Hema</h1>
+      {/* Heading */}
+      <h1>Welcome, User</h1>
       <p>Manage your healthcare journey</p>
 
       {/* Cards */}
       <div className="cards">
-        <div className="card-box" onClick={() => setShowForm(true)}>
-          Book Appointment
+        <div className="card">
+          <h3>Book Appointment</h3>
+          <p>Schedule a consultation</p>
         </div>
 
-        <div className="card-box">
-          Medical Records: {records.length}
+        <div className="card">
+          <h3>Medical Records</h3>
+          <p>{records.length} records</p>
         </div>
 
-        <div className="card-box">
-          Lab Reports: {labReports.length}
+        <div className="card">
+          <h3>Lab Reports</h3>
+          <p>{labReports.length} reports</p>
+        </div>
+
+        <div className="card">
+          <h3>Video Consult</h3>
+          <p>Join session</p>
         </div>
       </div>
 
-      {/* Booking Form */}
-      {showForm && (
-        <div className="section">
-          <h3>Book Appointment</h3>
+      {/* Book Appointment Form */}
+      <div className="section">
+        <h3>Book Appointment</h3>
 
-          <input
-            type="text"
-            placeholder="Doctor Name"
-            value={form.doctor}
-            onChange={(e) =>
-              setForm({ ...form, doctor: e.target.value })
-            }
-          />
+        <input
+          type="text"
+          placeholder="Enter your name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
 
-          <input
-            type="date"
-            value={form.date}
-            onChange={(e) =>
-              setForm({ ...form, date: e.target.value })
-            }
-          />
+        <input
+          type="text"
+          placeholder="Enter problem"
+          value={problem}
+          onChange={(e) => setProblem(e.target.value)}
+        />
 
-          <button onClick={handleBooking}>Confirm Booking</button>
-        </div>
-      )}
+        <button onClick={handleBook}>Book</button>
+      </div>
 
       {/* Appointments */}
       <div className="section">
         <h3>My Appointments</h3>
 
-        {appointments.map((a, index) => (
-          <div key={index} className="item">
-            {a.doctor} - {a.date}
-          </div>
-        ))}
+        {appointments.length === 0 ? (
+          <p>No appointments yet</p>
+        ) : (
+          appointments.map((a, index) => (
+            <div key={index} className="item">
+              <h4>{a.name}</h4>
+              <p>{a.problem}</p>
+              <small>{a.time}</small>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Lab Reports */}
       <div className="section">
         <h3>Lab Reports</h3>
 
-        {labReports.map((r, index) => (
-          <div key={index} className="item">
-            {r}
-          </div>
-        ))}
+        {labReports.length === 0 ? (
+          <p>No reports yet</p>
+        ) : (
+          labReports.map((r, index) => (
+            <div key={index} className="item">
+              <h4>{r.name}</h4>
+              <p>{r.report}</p>
+              <small>{r.date}</small>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
